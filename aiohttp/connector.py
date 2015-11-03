@@ -654,9 +654,11 @@ class ProxyConnector(TCPConnector):
                                                         path=req.path)
         if hdrs.AUTHORIZATION in proxy_req.headers:
             auth = proxy_req.headers[hdrs.AUTHORIZATION]
-            if not req.ssl:
-                del proxy_req.headers[hdrs.AUTHORIZATION]
+            del proxy_req.headers[hdrs.AUTHORIZATION]
             req.headers[hdrs.PROXY_AUTHORIZATION] = auth
+
+            if ssl:
+                proxy_req.headers[hdrs.PROXY_AUTHORIZATION] = auth
 
         if req.ssl:
             # For HTTPS requests over HTTP proxy
