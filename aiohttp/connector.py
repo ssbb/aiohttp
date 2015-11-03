@@ -1,27 +1,25 @@
 import asyncio
-import aiohttp
 import functools
 import http.cookies
-import ssl
 import socket
+import ssl
 import sys
 import traceback
 import warnings
-
 from collections import defaultdict
 from hashlib import md5, sha1, sha256
 from itertools import chain
 from math import ceil
 from types import MappingProxyType
 
+import aiohttp
+
 from . import hdrs
 from .client import ClientRequest
-from .errors import ServerDisconnectedError
-from .errors import HttpProxyError, ProxyConnectionError
-from .errors import ClientOSError, ClientTimeoutError
-from .errors import FingerprintMismatch
+from .errors import (
+    ClientOSError, ClientTimeoutError, FingerprintMismatch, HttpProxyError,
+    ProxyConnectionError, ServerDisconnectedError)
 from .helpers import BasicAuth
-
 
 __all__ = ('BaseConnector', 'TCPConnector', 'ProxyConnector', 'UnixConnector')
 
@@ -656,7 +654,8 @@ class ProxyConnector(TCPConnector):
                                                         path=req.path)
         if hdrs.AUTHORIZATION in proxy_req.headers:
             auth = proxy_req.headers[hdrs.AUTHORIZATION]
-            del proxy_req.headers[hdrs.AUTHORIZATION]
+            if not req.ssl:
+                del proxy_req.headers[hdrs.AUTHORIZATION]
             req.headers[hdrs.PROXY_AUTHORIZATION] = auth
 
         if req.ssl:
